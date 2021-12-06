@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id "com.github.johnrengelman.shadow" version "6.1.0"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
+group 'cz.raixo'
+version '1.0-DEV'
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://jitpack.io' }
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url = 'https://repo.essentialsx.net/releases/' }
+    maven { url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/' }
+}
+
+dependencies {
+    shadow 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
+    shadow 'net.essentialsx:EssentialsX:2.19.0'
+    shadow 'com.github.decentsoftware-eu:decentholograms:2.2.0'
+    shadow 'me.clip:placeholderapi:2.10.10'
+    shadow files("libs/AFKPlus.jar")
+    shadow files("libs/CMIAPI8.7.8.2.jar")
+    shadow files("libs/CMILib1.1.0.1.jar")
+    shadow files("libs/UltraAFK-API.jar")
+    implementation 'org.json:json:20210307'
+}
+
+compileJava.options.encoding = 'UTF-8'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+test {
+    useJUnitPlatform()
+}

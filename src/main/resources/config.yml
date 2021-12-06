@@ -1,0 +1,46 @@
+lang:
+  top:
+    nobody: "&cNobody"
+    nobody-breaks: "0"
+  timeout: "&cYou can't destroy the block now!"
+  timeout-prefix: "" # {prefix}1 minute 10 seconds
+  timeout-units:
+    hour: "hour"
+    hours: "hours"
+    minute: "minute"
+    minutes: "minutes"
+    second: "second"
+    seconds: "seconds"
+  afk: "&cYou are AFK!"
+options:
+  blockafk: true
+blocks:
+  example:
+    location: # Location of the block
+      world: "world_name"
+      x: 0
+      y: 100
+      z: 0
+    type: GOLD_BLOCK # Other types are listed here https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+    hologram: # Same as decent hologram lines (More info: https://wiki.decentsoftware.eu/)
+      - "#ICON: %type%"
+      - "<#44d48c>&lMINE BLOCKS</#448ed4>"
+      - "<#44d48c>&lTOP"
+      - "<#34ebe1>%player_1% &7- <#349feb>%player_1_breaks%"
+      - "<#34ebe1>%player_2% &7- <#349feb>%player_2_breaks%"
+      - "<#34ebe1>%player_3% &7- <#349feb>%player_3_breaks%"
+      - "<#41a6d9>%health%/%max_health%"
+      - "<#8d9599>Break to get reward"
+      - "&c%timeout%"
+    health: 100
+    timeout: 60 # Timeout in seconds
+    breakMessage: "&7Block was destroyed<nl>&7Your breaks: %breaks%"
+    rewards:
+      0-50: # From 0 breaks to 50 breaks
+        - "500;say common reward" # Probability (higher number means higher chance) ; command
+        - "100;say rare reward"
+      51-100-a: # From 51 breaks to 100 breaks
+        - "1;say The only reward"
+      51-100-b: # From 51 breaks to 100 breaks
+        - "100;give %player% golden_apple"
+        - "100;give %player% diamond"
