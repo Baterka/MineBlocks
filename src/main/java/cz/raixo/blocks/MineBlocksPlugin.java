@@ -129,6 +129,25 @@ public class MineBlocksPlugin extends JavaPlugin {
         running = true;
         getLogger().info("Enabled successfully!");
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) checkVersionNotification(onlinePlayer);
+        if (!config.contains("options.hologram-auto-refresh")) {
+            config.set("options.hologram-auto-refresh", true);
+            try {
+                config.save(this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (config.getBoolean("options.hologram-auto-refresh", true)) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    for (MineBlock value : blocks.values()) {
+                        value.getHologramInstance().refreshAllLines();
+                    }
+                }
+            }.runTaskTimer(this, 0, 50);
+            getLogger().info("Auto hologram refresh enabled!");
+        }
     }
 
     public MineBlock getBlock(String s) {
@@ -268,6 +287,12 @@ public class MineBlocksPlugin extends JavaPlugin {
                 public void run() {
                     String s = MineBlocksPlugin.this.getDescription().getVersion().toLowerCase(Locale.ROOT);
                     boolean b = false;
+                    boolean sound = false;
+                    if (getHologramManager().getHologramPlugin() == HologramManager.HologramPluginType.CMI) {
+                        MainCommand.message(player, "You are using <#2bb9e0>CMI &ras your hologram plugin in <#2bb9e0>MineBlocks&r!");
+                        MainCommand.error(player, "Please note that you are using CMI holograms at your own risk! Please use DecentHolograms for the best experience!");
+                        sound = true;
+                    }
                     if (s.contains("dev")) {
                         MainCommand.message(player, "You are using <#2bb9e0>development &rversion of <#2bb9e0>MineBlocks&r!");
                         b = true;
@@ -277,6 +302,8 @@ public class MineBlocksPlugin extends JavaPlugin {
                     }
                     if (b) {
                         MainCommand.error(player, "You should not use this version on a production server!");
+                    }
+                    if (b || sound) {
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 5000, .5f);
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 5000, 1.5f);
                     }

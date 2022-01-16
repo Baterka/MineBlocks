@@ -19,7 +19,7 @@ public class HologramManager {
         PluginManager pluginManager = plugin.getServer().getPluginManager();
         List<Plugin> plugins = Arrays.stream(pluginManager.getPlugins()).collect(Collectors.toList());
         for (HologramPluginType value : HologramPluginType.values()) {
-            if (plugins.stream().filter(pl -> pl.getName().equalsIgnoreCase(value.getPluginName())).count() > 0) {
+            if (plugins.stream().anyMatch(pl -> pl.getName().equalsIgnoreCase(value.getPluginName()))) {
                 hologramPlugin = value;
                 value.getHologramCreator().activate();
                 return;

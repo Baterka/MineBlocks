@@ -1,6 +1,6 @@
 name: MineBlocks
 description: Easy to use plugin, that allows you to create "Mine blocks" on your server
-version: 1.0-DEV
+version: 1.0
 main: cz.raixo.blocks.MineBlocksPlugin
 author: RAIXOCZ
 website: https://discord.gg/gTKvK48Par
@@ -9,7 +9,6 @@ softdepend:
   - DecentHolograms
   - CMI
   - Essentials
-  - CMILib
   - UltraAFK
   - AFKPlus
 commands:

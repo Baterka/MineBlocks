@@ -1,5 +1,6 @@
 package cz.raixo.blocks.afk;
 
+import com.Zrips.CMI.CMI;
 import com.Zrips.CMI.Containers.CMIUser;
 import com.earth2me.essentials.Essentials;
 import hotdoctor.plugin.ultraafk.UltraAFKAPI;
@@ -22,11 +23,13 @@ public class AfkAdapter {
         PluginManager pluginManager = plugin.getServer().getPluginManager();
         List<Plugin> plugins = Arrays.stream(pluginManager.getPlugins()).collect(Collectors.toList());
         for (AFKPluginType value : AFKPluginType.values()) {
-            if (plugins.stream().filter(pl -> pl.getName().equalsIgnoreCase(value.getPluginName())).count() > 0) {
-                AFKChecker afkChecker = value.getAfkChecker();
-                afkChecker.activate();
-                afkPlugins.add(value);
-                plugin.getLogger().info("AFK plugin registered: " + value.getPluginName());
+            if (plugins.stream().anyMatch(pl -> pl.getName().equalsIgnoreCase(value.getPluginName()))) {
+                try {
+                    AFKChecker afkChecker = value.getAfkChecker();
+                    afkChecker.activate();
+                    afkPlugins.add(value);
+                    plugin.getLogger().info("AFK plugin registered: " + value.getPluginName());
+                } catch (Throwable ignore) {}
             }
         }
     }
@@ -43,27 +46,29 @@ public class AfkAdapter {
     }
 
     public enum AFKPluginType {
-        CMI("CMI", new AFKChecker() {
+        PLUGIN_CMI("CMI", new AFKChecker() {
 
-            private com.Zrips.CMI.CMI cmi;
+            private CMI cmi;
 
             @Override
             public boolean isAFK(Player player) {
+                if (cmi == null) return false;
                 CMIUser cmiUser = cmi.getPlayerManager().getUser(player);
                 return cmiUser.isAfk();
             }
 
             @Override
             public void activate() {
-                this.cmi = (com.Zrips.CMI.CMI) Bukkit.getServer().getPluginManager().getPlugin("CMI");
+                this.cmi = (CMI) Bukkit.getServer().getPluginManager().getPlugin("CMI");
             }
         }),
-        ESSENTIALS("Essentials", new AFKChecker() {
+        PLUGIN_ESSENTIALS("Essentials", new AFKChecker() {
 
             private Essentials essentials;
 
             @Override
             public boolean isAFK(Player player) {
+                if (essentials == null) return false;
                 return essentials.getUser(player).isAfk();
             }
 
@@ -73,7 +78,7 @@ public class AfkAdapter {
             }
 
         }),
-        ULTRA_AFK("UltraAFK", new AFKChecker() {
+        PLUGIN_ULTRA_AFK("UltraAFK", new AFKChecker() {
 
             @Override
             public boolean isAFK(Player player) {
@@ -85,12 +90,13 @@ public class AfkAdapter {
 
             }
         }),
-        AFK_PLUS("AFKPlus", new AFKChecker() {
+        PLUGIN_AFK_PLUS("AFKPlus", new AFKChecker() {
 
             private AFKPlus afkPlus;
 
             @Override
             public boolean isAFK(Player player) {
+                if (afkPlus == null) return false;
                 return afkPlus.getPlayer(player).isAFK();
             }
 

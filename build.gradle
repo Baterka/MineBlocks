@@ -24,12 +24,12 @@ dependencies {
     shadow 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
     shadow 'net.essentialsx:EssentialsX:2.19.0'
     shadow 'com.github.decentsoftware-eu:decentholograms:2.2.0'
-    shadow 'me.clip:placeholderapi:2.10.10'
+    shadow 'me.clip:placeholderapi:2.11.1'
     shadow files("libs/AFKPlus.jar")
-    shadow files("libs/CMIAPI8.7.8.2.jar")
-    shadow files("libs/CMILib1.1.0.1.jar")
+    shadow files("libs/CMI9.0.6.2(1).jar")
+    shadow files("libs/CMILib1.1.0.4.jar")
     shadow files("libs/UltraAFK-API.jar")
-    implementation 'org.json:json:20210307'
+    implementation 'org.json:json:20211205'
 }
 
 compileJava.options.encoding = 'UTF-8'

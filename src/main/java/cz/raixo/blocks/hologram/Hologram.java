@@ -25,4 +25,6 @@ public interface Hologram {
 
     double getHeight();
 
+    void refreshAllLines();
+
 }

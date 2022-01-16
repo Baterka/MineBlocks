@@ -1,18 +1,23 @@
 package cz.raixo.blocks.hologram.decentholograms;
 
 import cz.raixo.blocks.hologram.Hologram;
+import eu.decentsoftware.holograms.api.DHAPI;
 import eu.decentsoftware.holograms.api.holograms.HologramLine;
+import eu.decentsoftware.holograms.api.holograms.HologramPage;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class DecentHologram implements Hologram {
 
     private final eu.decentsoftware.holograms.api.holograms.Hologram defaultHologram;
 
     public DecentHologram(Location location) {
-        this.defaultHologram = new eu.decentsoftware.holograms.api.holograms.Hologram("mb_hologram", location);
+        this.defaultHologram = DHAPI.createHologram("mb_hologram_" + ThreadLocalRandom.current().nextInt(1000), location);
     }
-
 
     @Override
     public void show(Player... players) {
@@ -35,12 +40,12 @@ public class DecentHologram implements Hologram {
 
     @Override
     public void setLine(int i, String content) {
-        defaultHologram.getPage(0).getLine(i).setContent(content);
+        DHAPI.setHologramLine(defaultHologram.getPage(0).getLine(i), content);
     }
 
     @Override
     public void addLine(String content) {
-        defaultHologram.getPage(0).addLine(new HologramLine(defaultHologram.getPage(0), defaultHologram.getLocation(), content));
+        DHAPI.addHologramLine(defaultHologram, content);
     }
 
     @Override
@@ -60,15 +65,23 @@ public class DecentHologram implements Hologram {
 
     @Override
     public void setLocation(Location location) {
-        defaultHologram.setLocation(location);
-        defaultHologram.realignLines();
-        defaultHologram.updateAll();
+        DHAPI.moveHologram(defaultHologram, location);
     }
 
     @Override
     public double getHeight() {
         defaultHologram.getPage(0).realignLines();
         return defaultHologram.getPage(0).getHeight();
+    }
+
+    @Override
+    public void refreshAllLines() {
+        HologramPage hologramPage = defaultHologram.getPage(0);
+        List<HologramLine> hologramLines = new ArrayList<>(hologramPage.getLines());
+        for (int i = 0; i < hologramLines.size(); i++) {
+            HologramLine line = hologramLines.get(i);
+            hologramPage.setLine(i, line.getContent());
+        }
     }
 
 }

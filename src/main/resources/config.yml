@@ -14,6 +14,7 @@ lang:
   afk: "&cYou are AFK!"
 options:
   blockafk: true
+  hologram-auto-refresh: true # fixes bug with holograms
 blocks:
   example:
     location: # Location of the block
