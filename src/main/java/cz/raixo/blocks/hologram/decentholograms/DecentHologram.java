@@ -10,13 +10,15 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DecentHologram implements Hologram {
 
+    private static final AtomicInteger ID = new AtomicInteger();
     private final eu.decentsoftware.holograms.api.holograms.Hologram defaultHologram;
 
     public DecentHologram(Location location) {
-        this.defaultHologram = DHAPI.createHologram("mb_hologram_" + ThreadLocalRandom.current().nextInt(1000), location);
+        this.defaultHologram = DHAPI.createHologram("mb_hologram_" + ID.getAndIncrement(), location);
     }
 
     @Override

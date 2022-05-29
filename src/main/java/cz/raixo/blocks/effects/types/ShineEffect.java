@@ -104,7 +104,7 @@ public class ShineEffect implements Effect {
 
     @Override
     public void make(Block block, MineBlock mineBlock, List<Player> players, ExecutionToken executionToken) {
-        if (players.size() > 0) {
+        if (!players.isEmpty()) {
             executionToken.executeAfter(500);
             Material blockType = block.getType();
             Location blockLocation = block.getLocation();
