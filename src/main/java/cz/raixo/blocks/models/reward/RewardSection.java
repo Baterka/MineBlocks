@@ -53,7 +53,7 @@ public class RewardSection {
 
     public void executeFor(String player, int breaks) {
         if (breaks <= this.to && breaks > this.from) {
-            if (this.rewards.size() > 0) {
+            if (!this.rewards.isEmpty()) {
                 SimpleRandom<Reward> rewards = new SimpleRandom<>();
                 for (Reward reward : this.rewards) {
                     rewards.add(reward.getChance(), reward);

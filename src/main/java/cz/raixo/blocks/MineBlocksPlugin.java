@@ -4,6 +4,7 @@ import cz.raixo.blocks.afk.AfkAdapter;
 import cz.raixo.blocks.commands.MainCommand;
 import cz.raixo.blocks.config.BlocksConfig;
 import cz.raixo.blocks.effects.executor.ParticleExecutor;
+import cz.raixo.blocks.hologram.Hologram;
 import cz.raixo.blocks.hologram.manager.HologramManager;
 import cz.raixo.blocks.listener.MineBlocksListener;
 import cz.raixo.blocks.menu.utils.ConversationUtil;
@@ -91,6 +92,7 @@ public class MineBlocksPlugin extends JavaPlugin {
         this.metrics = new Metrics(this, 13178);
         MainCommand mainCommand = new MainCommand();
         PluginCommand pluginCommand = getCommand("mineblocks");
+        assert pluginCommand != null;
         pluginCommand.setExecutor(mainCommand);
         pluginCommand.setTabCompleter(mainCommand);
         if (!this.getDataFolder().exists()) this.getDataFolder().mkdirs();

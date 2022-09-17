@@ -27,7 +27,7 @@ repositories {
 dependencies {
     shadow 'org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT'
     shadow 'net.essentialsx:EssentialsX:2.19.0'
-    shadow 'com.github.decentsoftware-eu:decentholograms:2.2.0'
+    shadow 'com.github.decentsoftware-eu:decentholograms:2.5.3'
     shadow 'me.clip:placeholderapi:2.11.1'
     shadow files("libs/AFKPlus.jar")
     shadow files("libs/CMI9.0.6.2(1).jar")

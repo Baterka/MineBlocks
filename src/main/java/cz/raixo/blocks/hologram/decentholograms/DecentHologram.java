@@ -79,10 +79,9 @@ public class DecentHologram implements Hologram {
     @Override
     public void refreshAllLines() {
         HologramPage hologramPage = defaultHologram.getPage(0);
-        List<HologramLine> hologramLines = new ArrayList<>(hologramPage.getLines());
-        for (int i = 0; i < hologramLines.size(); i++) {
-            HologramLine line = hologramLines.get(i);
-            hologramPage.setLine(i, line.getContent());
+        List<HologramLine> hologramLines = hologramPage.getLines();
+        for (HologramLine line : hologramLines) {
+            line.setContent(line.getContent());
         }
     }
 

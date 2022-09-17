@@ -36,6 +36,14 @@ blocks:
     health: 100
     timeout: 60 # Timeout in seconds
     breakMessage: "&7Block was destroyed<nl>&7Your breaks: %breaks%"
+    respawnMessage: "&7Block was respawned!"
+    topRewards: # Maximum top 10
+      1:
+        - "100;say %player% is first"
+      2:
+        - "100;say %player% is second"
+      3:
+        - "100;say %player% is third"
     rewards:
       0-50: # From 0 breaks to 50 breaks
         - "500;say common reward" # Probability (higher number means higher chance) ; command

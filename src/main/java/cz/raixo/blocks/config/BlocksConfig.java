@@ -17,12 +17,15 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -112,6 +115,11 @@ public class BlocksConfig implements ConfigurationSection {
             return null;
         }
         mineBlock.setBreakMessage(Common.colorize(blockConfig.getString("breakMessage", "")));
+        if (!blockConfig.isString("respawnMessage")) {
+            configError("Block '" + name + "' has invalid respawnMessage");
+            return null;
+        }
+        mineBlock.setRespawnMessage(Common.colorize(blockConfig.getString("respawnMessage", "")));
         if (!blockConfig.isInt("health")) {
             configError("Block '" + name + "' has invalid health");
             return null;
@@ -121,8 +129,10 @@ public class BlocksConfig implements ConfigurationSection {
         if (rewards != null) {
             mineBlock.setRewards(rewards);
         }
+        mineBlock.setTopRewards(getTopRewards(name));
         try {
             ConfigurationSection locationSection = blockConfig.getConfigurationSection("location");
+            assert locationSection != null;
             World world = Bukkit.getWorld(locationSection.getString("world", ""));
             if (world == null) {
                 configError("Block '" + name + "' has invalid location (world)");
@@ -203,6 +213,41 @@ public class BlocksConfig implements ConfigurationSection {
         }
     }
 
+    private Map<Integer, List<Reward>> getTopRewards(String name) {
+        ConfigurationSection rewardsConfig = getConfigurationSection("blocks." + name + ".toprewards");
+        if (rewardsConfig == null) return Collections.emptyMap();
+        Map<Integer, List<Reward>> rewardsMap = new HashMap<>();
+        for (String key : rewardsConfig.getKeys(false)) {
+            NumberUtil.parseInt(key).ifPresent(pos -> {
+                rewardsMap.put(pos, rewardsConfig.getStringList(key).stream().map(s -> {
+                    String[] data = s.split(";", 2);
+                    if (data.length < 2) {
+                        configError("Block '" + name + "' has invalid reward '" + s + "' in reward section '" + key + "'");
+                        return null;
+                    }
+                    Optional<Integer> chance = NumberUtil.parseInt(data[0]);
+                    if (chance.isEmpty()) {
+                        configError("Block '" + name + "' has invalid chance '" + data[0] + "' in reward '" + s + "' in reward section '" + key + "'");
+                        return null;
+                    }
+                    return new Reward(chance.get(), data[1]);
+                }).filter(Objects::nonNull).collect(Collectors.toList()));
+            });
+        }
+        return rewardsMap;
+    }
+
+    private void saveTopRewards(String name, Map<Integer, List<Reward>> rewards) {
+        ConfigurationSection rewardsConfig = getConfigurationSection("blocks." + name + ".toprewards");
+        if (rewardsConfig == null) return;
+        for (Map.Entry<Integer, List<Reward>> entry : rewards.entrySet()) {
+            rewardsConfig.set(entry.getKey().toString(),
+                    entry.getValue().stream().map(reward -> reward.getChance() + ";" + reward.getCommand())
+                            .collect(Collectors.toList())
+            );
+        }
+    }
+
     public void clearBlocks() {
         createSection("blocks");
     }
@@ -211,13 +256,14 @@ public class BlocksConfig implements ConfigurationSection {
         ConfigurationSection blockConfig = createSection("blocks." + mineBlock.getName());
         ConfigurationSection locationSection = blockConfig.createSection("location");
         Location location = mineBlock.getLocation();
-        locationSection.set("world", location.getWorld().getName());
+        locationSection.set("world", Objects.requireNonNull(location.getWorld()).getName());
         locationSection.set("x", location.getBlockX());
         locationSection.set("y", location.getBlockY());
         locationSection.set("z", location.getBlockZ());
         blockConfig.set("type", mineBlock.getBlockType().name());
         blockConfig.set("hologram", mineBlock.getHologram());
         blockConfig.set("breakMessage", mineBlock.getBreakMessage());
+        blockConfig.set("respawnMessage", mineBlock.getRespawnMessage());
         if (mineBlock.getBlockSeconds() > 0) {
             blockConfig.set("timeout", mineBlock.getBlockSeconds());
         }
@@ -225,6 +271,7 @@ public class BlocksConfig implements ConfigurationSection {
         List<String> effects = mineBlock.getEffects().stream().map(EffectRegister::save).filter(Objects::nonNull).collect(Collectors.toList());
         if (!effects.isEmpty()) blockConfig.set("effects", effects);
         saveRewards(mineBlock.getName(), mineBlock.getRewards());
+        saveTopRewards(mineBlock.getName(), mineBlock.getTopRewards());
     }
 
     private void saveRewards(String name, List<RewardSection> rewardSections) {
@@ -265,7 +312,7 @@ public class BlocksConfig implements ConfigurationSection {
     }
 
     @Override
-    public String getName() {
+    public @NotNull String getName() {
         return configuration.getName();
     }
 

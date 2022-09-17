@@ -78,18 +78,6 @@ public class AfkAdapter {
             }
 
         }),
-        PLUGIN_ULTRA_AFK("UltraAFK", new AFKChecker() {
-
-            @Override
-            public boolean isAFK(Player player) {
-                return UltraAFKAPI.isPlayerAFK(player);
-            }
-
-            @Override
-            public void activate() {
-
-            }
-        }),
         PLUGIN_AFK_PLUS("AFKPlus", new AFKChecker() {
 
             private AFKPlus afkPlus;

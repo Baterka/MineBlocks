@@ -4,11 +4,14 @@ import cz.raixo.blocks.MineBlocksPlugin;
 import cz.raixo.blocks.config.BlocksConfig;
 import cz.raixo.blocks.effects.Effect;
 import cz.raixo.blocks.hologram.Hologram;
+import cz.raixo.blocks.models.player.PlayerData;
 import cz.raixo.blocks.models.reward.PlayerRewardData;
+import cz.raixo.blocks.models.reward.Reward;
 import cz.raixo.blocks.models.reward.RewardSection;
 import cz.raixo.blocks.storage.StorageData;
 import cz.raixo.blocks.util.Cooldown;
 import cz.raixo.blocks.util.Placeholder;
+import cz.raixo.blocks.util.SimpleRandom;
 import eu.d0by.utils.Common;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -36,9 +39,11 @@ public class MineBlock {
     private List<String> hologram = new LinkedList<>();
     private Hologram hologramInstance;
     private String breakMessage = "";
+    private String respawnMessage = "";
     private long maxHealth = 0;
     private long health = maxHealth;
     private List<RewardSection> rewards = new LinkedList<>();
+    private Map<Integer, List<Reward>> topRewards = new HashMap<>();
     private List<PlayerRewardData> topPlayers = new ArrayList<>();
     private int blockMinutes = 0;
     private Date blockedUntil;
@@ -47,7 +52,7 @@ public class MineBlock {
     public void onBreak(Player player) {
         if (isUnloaded()) return;
         UUID uuid = player.getUniqueId();
-        if (!rewardData.containsKey(uuid)) rewardData.put(uuid, new PlayerRewardData(player));
+        rewardData.computeIfAbsent(uuid, k -> new PlayerRewardData(player));
         rewardData.get(uuid).addBreak();
         health--;
         if (health <= 0) onBreak();
@@ -101,6 +106,16 @@ public class MineBlock {
                 }
                 for (PlayerRewardData value : new LinkedList<>(rewardData.values())) {
                     value.reward(MineBlock.this);
+                }
+                for (int i = 0; i < topPlayers.size(); i++) {
+                    if (topRewards.containsKey(i + 1)) {
+                        PlayerRewardData playerData = topPlayers.get(i);
+                        SimpleRandom<Reward> rewardRandom = new SimpleRandom<>();
+                        for (Reward reward : topRewards.get(i + 1)) {
+                            rewardRandom.add(reward.getChance(), reward);
+                        }
+                        rewardRandom.next().executeFor(playerData.getPlayerData().getName());
+                    }
                 }
             }
         }.runTask(MineBlocksPlugin.getInstance());
@@ -271,6 +286,14 @@ public class MineBlock {
         this.breakMessage = breakMessage;
     }
 
+    public String getRespawnMessage() {
+        return respawnMessage;
+    }
+
+    public void setRespawnMessage(String respawnMessage) {
+        this.respawnMessage = respawnMessage;
+    }
+
     public long getMaxHealth() {
         return maxHealth;
     }
@@ -299,6 +322,14 @@ public class MineBlock {
 
     public void setRewards(List<RewardSection> rewards) {
         this.rewards = rewards;
+    }
+
+    public Map<Integer, List<Reward>> getTopRewards() {
+        return topRewards;
+    }
+
+    public void setTopRewards(Map<Integer, List<Reward>> topRewards) {
+        this.topRewards = topRewards;
     }
 
     public List<PlayerRewardData> getTopPlayers() {
