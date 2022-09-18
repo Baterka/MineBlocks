@@ -289,11 +289,9 @@ public class MineBlocksPlugin extends JavaPlugin {
                 public void run() {
                     String s = MineBlocksPlugin.this.getDescription().getVersion().toLowerCase(Locale.ROOT);
                     boolean b = false;
-                    boolean sound = false;
                     if (getHologramManager().getHologramPlugin() == HologramManager.HologramPluginType.CMI) {
                         MainCommand.message(player, "You are using <#2bb9e0>CMI &ras your hologram plugin in <#2bb9e0>MineBlocks&r!");
-                        MainCommand.error(player, "Please note that you are using CMI holograms at your own risk! Please use DecentHolograms for the best experience!");
-                        sound = true;
+                        MainCommand.error(player, "You might be experiencing some issues! Please report them on our discord!");
                     }
                     if (s.contains("dev")) {
                         MainCommand.message(player, "You are using <#2bb9e0>development &rversion of <#2bb9e0>MineBlocks&r!");
@@ -305,7 +303,7 @@ public class MineBlocksPlugin extends JavaPlugin {
                     if (b) {
                         MainCommand.error(player, "You should not use this version on a production server!");
                     }
-                    if (b || sound) {
+                    if (b) {
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 5000, .5f);
                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_BIT, 5000, 1.5f);
                     }

@@ -130,6 +130,8 @@ public class BlocksConfig implements ConfigurationSection {
             mineBlock.setRewards(rewards);
         }
         mineBlock.setTopRewards(getTopRewards(name));
+        mineBlock.setLastBreakRewards(getLastBreakRewards(name));
+        mineBlock.setBreakRewards(getBreakRewards(name));
         try {
             ConfigurationSection locationSection = blockConfig.getConfigurationSection("location");
             assert locationSection != null;
@@ -214,31 +216,63 @@ public class BlocksConfig implements ConfigurationSection {
     }
 
     private Map<Integer, List<Reward>> getTopRewards(String name) {
-        ConfigurationSection rewardsConfig = getConfigurationSection("blocks." + name + ".toprewards");
+        ConfigurationSection rewardsConfig = getConfigurationSection("blocks." + name + ".topRewards");
         if (rewardsConfig == null) return Collections.emptyMap();
         Map<Integer, List<Reward>> rewardsMap = new HashMap<>();
         for (String key : rewardsConfig.getKeys(false)) {
-            NumberUtil.parseInt(key).ifPresent(pos -> {
-                rewardsMap.put(pos, rewardsConfig.getStringList(key).stream().map(s -> {
-                    String[] data = s.split(";", 2);
-                    if (data.length < 2) {
-                        configError("Block '" + name + "' has invalid reward '" + s + "' in reward section '" + key + "'");
-                        return null;
-                    }
-                    Optional<Integer> chance = NumberUtil.parseInt(data[0]);
-                    if (chance.isEmpty()) {
-                        configError("Block '" + name + "' has invalid chance '" + data[0] + "' in reward '" + s + "' in reward section '" + key + "'");
-                        return null;
-                    }
-                    return new Reward(chance.get(), data[1]);
-                }).filter(Objects::nonNull).collect(Collectors.toList()));
-            });
+            NumberUtil.parseInt(key).ifPresent(pos -> rewardsMap.put(pos, rewardsConfig.getStringList(key).stream().map(s -> {
+                String[] data = s.split(";", 2);
+                if (data.length < 2) {
+                    configError("Block '" + name + "' has invalid reward '" + s + "' in top reward '" + key + "'");
+                    return null;
+                }
+                Optional<Integer> chance = NumberUtil.parseInt(data[0]);
+                if (chance.isEmpty()) {
+                    configError("Block '" + name + "' has invalid chance '" + data[0] + "' in reward '" + s + "' in top reward '" + key + "'");
+                    return null;
+                }
+                return new Reward(chance.get(), data[1]);
+            }).filter(Objects::nonNull).collect(Collectors.toList())));
         }
         return rewardsMap;
     }
 
+    private List<Reward> getLastBreakRewards(String name) {
+        if (!isList("blocks." + name + ".lastBreakReward")) return Collections.emptyList();
+        return getStringList("blocks." + name + ".lastBreakReward").stream().map(s -> {
+            String[] data = s.split(";", 2);
+            if (data.length < 2) {
+                configError("Block '" + name + "' has invalid reward '" + s + "' in last break reward");
+                return null;
+            }
+            Optional<Integer> chance = NumberUtil.parseInt(data[0]);
+            if (chance.isEmpty()) {
+                configError("Block '" + name + "' has invalid chance '" + data[0] + "' in reward '" + s + "' in last break reward");
+                return null;
+            }
+            return new Reward(chance.get(), data[1]);
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    private List<Reward> getBreakRewards(String name) {
+        if (!isList("blocks." + name + ".breakReward")) return Collections.emptyList();
+        return getStringList("blocks." + name + ".breakReward").stream().map(s -> {
+            String[] data = s.split(";", 2);
+            if (data.length < 2) {
+                configError("Block '" + name + "' has invalid reward '" + s + "' in break reward");
+                return null;
+            }
+            Optional<Integer> chance = NumberUtil.parseInt(data[0]);
+            if (chance.isEmpty()) {
+                configError("Block '" + name + "' has invalid chance '" + data[0] + "' in reward '" + s + "' in break reward");
+                return null;
+            }
+            return new Reward(chance.get(), data[1]);
+        }).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
     private void saveTopRewards(String name, Map<Integer, List<Reward>> rewards) {
-        ConfigurationSection rewardsConfig = getConfigurationSection("blocks." + name + ".toprewards");
+        ConfigurationSection rewardsConfig = getConfigurationSection("blocks." + name + ".topRewards");
         if (rewardsConfig == null) return;
         for (Map.Entry<Integer, List<Reward>> entry : rewards.entrySet()) {
             rewardsConfig.set(entry.getKey().toString(),
@@ -246,6 +280,20 @@ public class BlocksConfig implements ConfigurationSection {
                             .collect(Collectors.toList())
             );
         }
+    }
+
+    private void saveLastBreakRewards(String name, List<Reward> rewards) {
+        set("blocks." + name + ".lastBreakReward",
+                rewards.stream().map(reward -> reward.getChance() + ";" + reward.getCommand())
+                        .collect(Collectors.toList())
+        );
+    }
+
+    private void saveBreakRewards(String name, List<Reward> rewards) {
+        set("blocks." + name + ".breakReward",
+                rewards.stream().map(reward -> reward.getChance() + ";" + reward.getCommand())
+                        .collect(Collectors.toList())
+        );
     }
 
     public void clearBlocks() {
@@ -272,6 +320,8 @@ public class BlocksConfig implements ConfigurationSection {
         if (!effects.isEmpty()) blockConfig.set("effects", effects);
         saveRewards(mineBlock.getName(), mineBlock.getRewards());
         saveTopRewards(mineBlock.getName(), mineBlock.getTopRewards());
+        saveLastBreakRewards(mineBlock.getName(), mineBlock.getLastBreakRewards());
+        saveBreakRewards(mineBlock.getName(), mineBlock.getBreakRewards());
     }
 
     private void saveRewards(String name, List<RewardSection> rewardSections) {

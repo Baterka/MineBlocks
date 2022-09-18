@@ -12,9 +12,11 @@ lang:
     second: "second"
     seconds: "seconds"
   afk: "&cYou are AFK!"
+  no-permission: "&cYou don't have permission to break this block!"
 options:
   blockafk: true
   hologram-auto-refresh: true # fixes bug with holograms
+  notification-type: ACTION_BAR # ACTION_BAR, CHAT, SYSTEM
 blocks:
   example:
     location: # Location of the block
@@ -23,6 +25,7 @@ blocks:
       y: 100
       z: 0
     type: GOLD_BLOCK # Other types are listed here https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+    permission: ""
     hologram: # Same as decent hologram lines (More info: https://wiki.decentsoftware.eu/)
       - "#ICON: %type%"
       - "<#44d48c>&lMINE BLOCKS</#448ed4>"
@@ -37,6 +40,10 @@ blocks:
     timeout: 60 # Timeout in seconds
     breakMessage: "&7Block was destroyed<nl>&7Your breaks: %breaks%"
     respawnMessage: "&7Block was respawned!"
+    lastBreakReward:
+      - "100;say %player% broke the block the last time!"
+    breakReward:
+      - "100;say %player% broke the block!"
     topRewards: # Maximum top 10
       1:
         - "100;say %player% is first"

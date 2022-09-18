@@ -1,5 +1,6 @@
 package cz.raixo.blocks.models;
 
+import com.Zrips.CMI.commands.list.effect;
 import cz.raixo.blocks.MineBlocksPlugin;
 import cz.raixo.blocks.config.BlocksConfig;
 import cz.raixo.blocks.effects.Effect;
@@ -18,6 +19,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.json.JSONArray;
 
 import java.io.File;
@@ -36,6 +38,7 @@ public class MineBlock {
     private String name;
     private Location location;
     private Material blockType = Material.AIR;
+    private String permission;
     private List<String> hologram = new LinkedList<>();
     private Hologram hologramInstance;
     private String breakMessage = "";
@@ -44,9 +47,12 @@ public class MineBlock {
     private long health = maxHealth;
     private List<RewardSection> rewards = new LinkedList<>();
     private Map<Integer, List<Reward>> topRewards = new HashMap<>();
+    private List<Reward> lastBreakRewards = new LinkedList<>();
+    private List<Reward> breakRewards = new LinkedList<>();
     private List<PlayerRewardData> topPlayers = new ArrayList<>();
     private int blockMinutes = 0;
     private Date blockedUntil;
+    private BukkitTask respawnTask;
     private boolean unloaded = false;
 
     public void onBreak(Player player) {
@@ -55,7 +61,11 @@ public class MineBlock {
         rewardData.computeIfAbsent(uuid, k -> new PlayerRewardData(player));
         rewardData.get(uuid).addBreak();
         health--;
-        if (health <= 0) onBreak();
+        giveBreakRewards(player.getName());
+        if (health <= 0) {
+            giveLastBreakRewards(player.getName());
+            onBreak();
+        }
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -109,9 +119,11 @@ public class MineBlock {
                 }
                 for (int i = 0; i < topPlayers.size(); i++) {
                     if (topRewards.containsKey(i + 1)) {
+                        List<Reward> topRewardList = topRewards.get(i + 1);
+                        if (topRewardList.isEmpty()) continue;
                         PlayerRewardData playerData = topPlayers.get(i);
                         SimpleRandom<Reward> rewardRandom = new SimpleRandom<>();
-                        for (Reward reward : topRewards.get(i + 1)) {
+                        for (Reward reward : topRewardList) {
                             rewardRandom.add(reward.getChance(), reward);
                         }
                         rewardRandom.next().executeFor(playerData.getPlayerData().getName());
@@ -156,7 +168,6 @@ public class MineBlock {
         removeHologram();
         if (location == null) return;
         Hologram hologram = MineBlocksPlugin.getInstance().getHologramManager().createHologram(this.location.clone().add(.5, 1, .5));
-        Location l = hologram.getLocation().clone();
         for (String s : this.hologram) {
             hologram.addLine(parseHoloLine(s));
         }
@@ -269,6 +280,14 @@ public class MineBlock {
         setBlock();
     }
 
+    public String getPermission() {
+        return permission;
+    }
+
+    public void setPermission(String permission) {
+        this.permission = permission;
+    }
+
     public List<String> getHologram() {
         return hologram;
     }
@@ -332,6 +351,22 @@ public class MineBlock {
         this.topRewards = topRewards;
     }
 
+    public List<Reward> getLastBreakRewards() {
+        return lastBreakRewards;
+    }
+
+    public void setLastBreakRewards(List<Reward> lastBreakRewards) {
+        this.lastBreakRewards = lastBreakRewards;
+    }
+
+    public List<Reward> getBreakRewards() {
+        return breakRewards;
+    }
+
+    public void setBreakRewards(List<Reward> breakRewards) {
+        this.breakRewards = breakRewards;
+    }
+
     public List<PlayerRewardData> getTopPlayers() {
         return new ArrayList<>(topPlayers);
     }
@@ -352,6 +387,39 @@ public class MineBlock {
 
     public void setBlockedUntil(Date blockedUntil) {
         this.blockedUntil = blockedUntil;
+        if (respawnTask != null) {
+            respawnTask.cancel();
+            respawnTask = null;
+        }
+        if (isBlocked()) {
+            long time = getBlockedUntil().getTime() - System.currentTimeMillis();
+            time /= 50;
+            if (time > 0) {
+                respawnTask = Bukkit.getScheduler().runTaskLater(MineBlocksPlugin.getInstance(), () -> {
+                    if (!MineBlock.this.respawnMessage.equals("")) {
+                        Bukkit.broadcastMessage(Common.colorize(MineBlock.this.respawnMessage.replace("<nl>", "\n")));
+                    }
+                }, time);
+            }
+        }
+    }
+
+    protected void giveLastBreakRewards(String name) {
+        if (lastBreakRewards.isEmpty()) return;
+        SimpleRandom<Reward> rewardRandom = new SimpleRandom<>();
+        for (Reward reward : lastBreakRewards) {
+            rewardRandom.add(reward.getChance(), reward);
+        }
+        rewardRandom.next().executeFor(name);
+    }
+
+    protected void giveBreakRewards(String name) {
+        if (breakRewards.isEmpty()) return;
+        SimpleRandom<Reward> rewardRandom = new SimpleRandom<>();
+        for (Reward reward : breakRewards) {
+            rewardRandom.add(reward.getChance(), reward);
+        }
+        rewardRandom.next().executeFor(name);
     }
 
     private static final long HOUR_MS = TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS);

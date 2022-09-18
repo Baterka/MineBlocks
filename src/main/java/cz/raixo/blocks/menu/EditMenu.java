@@ -211,6 +211,67 @@ public class EditMenu extends GUIExtender {
                 }
             }
         });
+        List<String> respawnMessageLore = new ArrayList<>();
+        respawnMessageLore.add("&7Current message:");
+        if (!mineBlock.getRespawnMessage().equals("")) {
+            respawnMessageLore.addAll(Arrays.stream(mineBlock.getRespawnMessage().split("<nl>")).map(s -> "&8 - <#d44a91>" + s).collect(Collectors.toList()));
+        } else {
+            respawnMessageLore.add("<#d44a91>None message");
+        }
+        respawnMessageLore.add("&r");
+        respawnMessageLore.add("<#d44a91>Click to edit!");
+        setItem(5, new GUIItemBuilder(Material.TOTEM_OF_UNDYING).addFlags(ItemFlag.values()).setName(Common.colorize("<#d44a91>&lRespawn message")).setLore(Common.colorize(respawnMessageLore)), new GUIExtenderItem() {
+            @Override
+            public void onClick(InventoryClickEvent event) {
+                if (event.getWhoClicked() instanceof Player) {
+                    Player player = (Player) event.getWhoClicked();
+                    player.closeInventory();
+                    MainCommand.message(player, "Please type new respawn message! Use <#2bb9e0><nl> &rto indicate a newline");
+                    ConversationUtil.getInstance().createConversation(player, new ConversationUtil.ConversationListener() {
+                        @Override
+                        public boolean onMessage(String message) {
+                            mineBlock.setRespawnMessage(message.equalsIgnoreCase("none") ? "" : message);
+                            saveToConfig();
+                            return false;
+                        }
+
+                        @Override
+                        public void onExit() {
+                            redraw();
+                            openInventory(player);
+                        }
+                    });
+                }
+            }
+        });
+        setItem(3, new GUIItemBuilder(Material.IRON_DOOR).addFlags(ItemFlag.values()).setName(Common.colorize("<#db3768>&lPermission")).setLore(Common.colorize(List.of(
+                "&7Current permission: <#db3768>" + Optional.ofNullable(mineBlock.getPermission()).filter(s -> !s.isEmpty()).orElse("None"),
+                "&r",
+                "<#db3768>Click to edit!"
+        ))), new GUIExtenderItem() {
+            @Override
+            public void onClick(InventoryClickEvent event) {
+                if (event.getWhoClicked() instanceof Player) {
+                    Player player = (Player) event.getWhoClicked();
+                    player.closeInventory();
+                    MainCommand.message(player, "Please type new permission! Or <#2bb9e0>'none' &rto remove the current one");
+                    ConversationUtil.getInstance().createConversation(player, new ConversationUtil.ConversationListener() {
+                        @Override
+                        public boolean onMessage(String message) {
+                            mineBlock.setPermission(message.equalsIgnoreCase("none") ? "" : message);
+                            saveToConfig();
+                            return false;
+                        }
+
+                        @Override
+                        public void onExit() {
+                            redraw();
+                            openInventory(player);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private String getLocationAsString() {

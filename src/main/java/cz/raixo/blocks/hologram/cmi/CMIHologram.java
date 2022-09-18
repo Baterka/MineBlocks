@@ -20,7 +20,7 @@ public class CMIHologram implements Hologram {
         Runnable creator = () -> {
             this.cmiHologram = new com.Zrips.CMI.Modules.Holograms.CMIHologram("mb_hologram", new CMILocation(location));
             CMI.getInstance().getHologramManager().addHologram(cmiHologram);
-            cmiHologram.update();
+            synchronized (this) { cmiHologram.update(); }
         };
         if (Bukkit.isPrimaryThread()) {
             creator.run();
@@ -50,12 +50,13 @@ public class CMIHologram implements Hologram {
     @Override
     public void setLine(int i, String content) {
         cmiHologram.setLine(i, content);
+        synchronized (this) { cmiHologram.update(); }
     }
 
     @Override
     public void addLine(String content) {
         cmiHologram.addLine(content);
-        cmiHologram.refresh();
+        synchronized (this) { cmiHologram.update(); }
     }
 
     @Override
