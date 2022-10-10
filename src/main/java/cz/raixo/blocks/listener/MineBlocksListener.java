@@ -77,6 +77,9 @@ public class MineBlocksListener implements Listener {
             return;
         }
         if (!mineBlock.isBlocked()) {
+            if (e.getBlock().getType() != mineBlock.getBlockType()) {
+                e.getBlock().setType(mineBlock.getBlockType());
+            }
             mineBlock.onBreak(e.getPlayer());
         } else {
             e.getPlayer().spigot().sendMessage(ChatMessageType.valueOf(plugin.getBlockConfig().getString("options.notification-type", "ACTION_BAR")), TextComponent.fromLegacyText(
@@ -85,6 +88,9 @@ public class MineBlocksListener implements Listener {
                     )
             ));
             e.getPlayer().playSound(e.getBlock().getLocation(), Sound.BLOCK_ANVIL_LAND, 100, 100);
+            if (mineBlock.getCooldownBlock() != null && e.getBlock().getType() != mineBlock.getCooldownBlock()) {
+                e.getBlock().setType(mineBlock.getCooldownBlock());
+            }
         }
     }
 

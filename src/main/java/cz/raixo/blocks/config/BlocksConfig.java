@@ -102,6 +102,17 @@ public class BlocksConfig implements ConfigurationSection {
             configError("Block '" + name + "' has invalid type");
             return null;
         }
+        try {
+            String cooldownTypeString = blockConfig.getString("cooldownType");
+            if (cooldownTypeString != null) {
+                Material cooldownType = Material.valueOf(cooldownTypeString);
+                if (!cooldownType.isBlock()) throw new IllegalArgumentException("Cooldown type must be a block");
+                mineBlock.setCooldownBlock(cooldownType);
+            }
+        } catch (Throwable t) {
+            configError("Block '" + name + "' has invalid cooldown type");
+            return null;
+        }
         if (blockConfig.isInt("timeout")) {
             mineBlock.setBlockSeconds(blockConfig.getInt("timeout"));
         }
@@ -148,6 +159,7 @@ public class BlocksConfig implements ConfigurationSection {
             );
             mineBlock.setLocation(location);
         } catch (Throwable t) {
+            t.printStackTrace();
             configError("Block '" + name + "' has invalid location");
             return null;
         }
@@ -272,8 +284,7 @@ public class BlocksConfig implements ConfigurationSection {
     }
 
     private void saveTopRewards(String name, Map<Integer, List<Reward>> rewards) {
-        ConfigurationSection rewardsConfig = getConfigurationSection("blocks." + name + ".topRewards");
-        if (rewardsConfig == null) return;
+        ConfigurationSection rewardsConfig = createSection("blocks." + name + ".topRewards");
         for (Map.Entry<Integer, List<Reward>> entry : rewards.entrySet()) {
             rewardsConfig.set(entry.getKey().toString(),
                     entry.getValue().stream().map(reward -> reward.getChance() + ";" + reward.getCommand())
@@ -309,6 +320,7 @@ public class BlocksConfig implements ConfigurationSection {
         locationSection.set("y", location.getBlockY());
         locationSection.set("z", location.getBlockZ());
         blockConfig.set("type", mineBlock.getBlockType().name());
+        blockConfig.set("cooldownType", Optional.ofNullable(mineBlock.getCooldownBlock()).map(Material::name).orElse(null));
         blockConfig.set("hologram", mineBlock.getHologram());
         blockConfig.set("breakMessage", mineBlock.getBreakMessage());
         blockConfig.set("respawnMessage", mineBlock.getRespawnMessage());

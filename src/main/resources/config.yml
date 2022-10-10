@@ -25,6 +25,7 @@ blocks:
       y: 100
       z: 0
     type: GOLD_BLOCK # Other types are listed here https://hub.spigotmc.org/javadocs/spigot/org/bukkit/Material.html
+    cooldownType: BEDROCK
     permission: ""
     hologram: # Same as decent hologram lines (More info: https://wiki.decentsoftware.eu/)
       - "#ICON: %type%"

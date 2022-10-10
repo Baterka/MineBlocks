@@ -71,7 +71,7 @@ public class CMIHologram implements Hologram {
 
     @Override
     public Location getLocation() {
-        return cmiHologram.getLocation().getBukkitLoc();
+        return cmiHologram.getCenterLocation();
     }
 
     @Override

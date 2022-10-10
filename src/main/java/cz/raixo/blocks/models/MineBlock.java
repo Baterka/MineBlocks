@@ -1,6 +1,5 @@
 package cz.raixo.blocks.models;
 
-import com.Zrips.CMI.commands.list.effect;
 import cz.raixo.blocks.MineBlocksPlugin;
 import cz.raixo.blocks.config.BlocksConfig;
 import cz.raixo.blocks.effects.Effect;
@@ -38,6 +37,7 @@ public class MineBlock {
     private String name;
     private Location location;
     private Material blockType = Material.AIR;
+    private Material cooldownBlock  = null;
     private String permission;
     private List<String> hologram = new LinkedList<>();
     private Hologram hologramInstance;
@@ -280,6 +280,14 @@ public class MineBlock {
         setBlock();
     }
 
+    public Material getCooldownBlock() {
+        return cooldownBlock;
+    }
+
+    public void setCooldownBlock(Material cooldownBlock) {
+        this.cooldownBlock = cooldownBlock;
+    }
+
     public String getPermission() {
         return permission;
     }
@@ -392,6 +400,8 @@ public class MineBlock {
             respawnTask = null;
         }
         if (isBlocked()) {
+            Material cooldownBlock = getCooldownBlock();
+            if (cooldownBlock != null) getLocation().getBlock().setType(cooldownBlock);
             long time = getBlockedUntil().getTime() - System.currentTimeMillis();
             time /= 50;
             if (time > 0) {
@@ -399,6 +409,7 @@ public class MineBlock {
                     if (!MineBlock.this.respawnMessage.equals("")) {
                         Bukkit.broadcastMessage(Common.colorize(MineBlock.this.respawnMessage.replace("<nl>", "\n")));
                     }
+                    getLocation().getBlock().setType(blockType);
                 }, time);
             }
         }
