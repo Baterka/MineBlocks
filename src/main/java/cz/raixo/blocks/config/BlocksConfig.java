@@ -113,6 +113,9 @@ public class BlocksConfig implements ConfigurationSection {
             configError("Block '" + name + "' has invalid cooldown type");
             return null;
         }
+        if (blockConfig.isString("permission")) {
+            mineBlock.setPermission(blockConfig.getString("permission"));
+        }
         if (blockConfig.isInt("timeout")) {
             mineBlock.setBlockSeconds(blockConfig.getInt("timeout"));
         }
@@ -321,6 +324,7 @@ public class BlocksConfig implements ConfigurationSection {
         locationSection.set("z", location.getBlockZ());
         blockConfig.set("type", mineBlock.getBlockType().name());
         blockConfig.set("cooldownType", Optional.ofNullable(mineBlock.getCooldownBlock()).map(Material::name).orElse(null));
+        blockConfig.set("permission", mineBlock.getPermission());
         blockConfig.set("hologram", mineBlock.getHologram());
         blockConfig.set("breakMessage", mineBlock.getBreakMessage());
         blockConfig.set("respawnMessage", mineBlock.getRespawnMessage());
