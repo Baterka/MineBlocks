@@ -163,9 +163,10 @@ public class MineBlocksPlugin extends JavaPlugin {
     public void onDisable() {
         if (!running) return;
         running = false;
+        this.storageManager.clearData();
         for (MineBlock block : new ArrayList<>(this.getBlocks())) {
-            this.removeBlock(block.getLocation());
             this.storageManager.save(block.getName(), new StorageData(block));
+            this.removeBlock(block.getLocation());
         }
         try {
             this.storageManager.saveStorage(this);
@@ -208,11 +209,12 @@ public class MineBlocksPlugin extends JavaPlugin {
     }
 
     public void reload() throws IOException {
+        this.storageManager.clearData();
         for (MineBlock block : new ArrayList<>(this.getBlocks())) {
-            removeBlock(block.getLocation());
             this.storageManager.save(block.getName(), new StorageData(block));
-            this.storageManager.saveStorage(this);
+            removeBlock(block.getLocation());
         }
+        this.storageManager.saveStorage(this);
         this.particleExecutor.disable();
         this.config.reload(this);
         for (MineBlock block : this.config.getBlocks()) {
@@ -227,11 +229,12 @@ public class MineBlocksPlugin extends JavaPlugin {
     }
 
     public void softReload() throws IOException {
+        this.storageManager.clearData();
         for (MineBlock block : new ArrayList<>(this.getBlocks())) {
-            removeBlock(block.getLocation());
             this.storageManager.save(block.getName(), new StorageData(block));
-            this.storageManager.saveStorage(this);
+            removeBlock(block.getLocation());
         }
+        this.storageManager.saveStorage(this);
         this.particleExecutor.disable();
         for (MineBlock block : this.config.getBlocks()) {
             if (block == null) continue;

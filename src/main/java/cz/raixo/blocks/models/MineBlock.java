@@ -37,7 +37,7 @@ public class MineBlock {
     private String name;
     private Location location;
     private Material blockType = Material.AIR;
-    private Material cooldownBlock  = null;
+    private Material cooldownBlock = null;
     private String permission;
     private List<String> hologram = new LinkedList<>();
     private Hologram hologramInstance;
@@ -82,17 +82,6 @@ public class MineBlock {
         if (getBlockSeconds() > 0) {
             setBlockedUntil(new Date(System.currentTimeMillis() + TimeUnit.MILLISECONDS.convert(this.blockMinutes, TimeUnit.SECONDS)));
         }
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!MineBlock.this.isBlocked()) {
-                    topPlayers.clear();
-                    cancel();
-                }
-                refreshHologram();
-            }
-        }.runTaskTimer(MineBlocksPlugin.getInstance(), 0, 20);
-        refreshHologram();
         new BukkitRunnable() {
 
             private final List<PlayerRewardData> topPlayers = new ArrayList<>(MineBlock.this.topPlayers);
@@ -400,6 +389,17 @@ public class MineBlock {
             respawnTask = null;
         }
         if (isBlocked()) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!MineBlock.this.isBlocked()) {
+                        topPlayers.clear();
+                        cancel();
+                    }
+                    refreshHologram();
+                }
+            }.runTaskTimer(MineBlocksPlugin.getInstance(), 0, 20);
+
             Material cooldownBlock = getCooldownBlock();
             if (cooldownBlock != null) getLocation().getBlock().setType(cooldownBlock);
             long time = getBlockedUntil().getTime() - System.currentTimeMillis();

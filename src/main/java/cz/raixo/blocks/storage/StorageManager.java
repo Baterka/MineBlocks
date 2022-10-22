@@ -35,6 +35,10 @@ public class StorageManager {
         this.data.put(name, data.toJson());
     }
 
+    public void clearData() {
+        this.data = new JSONObject();
+    }
+
     public void saveStorage(Plugin plugin) throws IOException {
         File configFile = new File(plugin.getDataFolder(), FILE_NAME);
         if (!configFile.exists()) {

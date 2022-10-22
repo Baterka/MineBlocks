@@ -6,15 +6,20 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class StorageData {
 
     private long health;
     private List<PlayerRewardData> rewardData = new ArrayList<>();
 
+    private Date blockedUntil;
+
     public StorageData(JSONObject jsonObject) {
         this.health = jsonObject.getInt("health");
+        this.blockedUntil = Optional.of(jsonObject.optLong("blockedUntil")).map(Date::new).filter(date -> date.getTime() > System.currentTimeMillis()).orElse(null);
         JSONArray rewardDataArray = jsonObject.getJSONArray("rewardData");
         for (Object o : rewardDataArray) {
             if (o instanceof JSONObject) {
@@ -25,14 +30,7 @@ public class StorageData {
     public StorageData(MineBlock mineBlock) {
         this.health = mineBlock.getHealth();
         this.rewardData = new ArrayList<>(mineBlock.getRewardData().values());
-    }
-
-    public long getHealth() {
-        return health;
-    }
-
-    public void setHealth(long health) {
-        this.health = health;
+        this.blockedUntil = mineBlock.getBlockedUntil();
     }
 
     public JSONObject toJson() {
@@ -43,6 +41,9 @@ public class StorageData {
             jsonArray.put(reward.toJson());
         }
         data.put("rewardData", jsonArray);
+        if (blockedUntil != null && blockedUntil.getTime() > System.currentTimeMillis()) {
+            data.put("blockedUntil", blockedUntil.getTime());
+        }
         return data;
     }
 
@@ -52,6 +53,7 @@ public class StorageData {
         }
         mineBlock.updateTopPlayers(true);
         mineBlock.setHealth(this.health);
+        mineBlock.setBlockedUntil(this.blockedUntil);
     }
 
 }
