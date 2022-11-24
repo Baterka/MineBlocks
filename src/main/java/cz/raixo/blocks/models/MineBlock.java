@@ -412,7 +412,7 @@ public class MineBlock {
                     getLocation().getBlock().setType(blockType);
                 }, time);
             }
-        }
+        } else getLocation().getBlock().setType(getBlockType());
     }
 
     protected void giveLastBreakRewards(String name) {
