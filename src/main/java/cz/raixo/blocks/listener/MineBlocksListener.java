@@ -18,10 +18,15 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class MineBlocksListener implements Listener {
 
     private final MineBlocksPlugin plugin;
+    private final Map<UUID, Long> lastBreak = new HashMap<>();
 
     public MineBlocksListener(MineBlocksPlugin plugin) {
         this.plugin = plugin;
@@ -29,6 +34,7 @@ public class MineBlocksListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
+        lastBreak.remove(e.getPlayer().getUniqueId());
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -57,6 +63,11 @@ public class MineBlocksListener implements Listener {
         MineBlock mineBlock = plugin.getBlock(e.getBlock().getLocation());
         if (mineBlock == null) return;
         e.setCancelled(true);
+        if (lastBreak.containsKey(e.getPlayer().getUniqueId()) &&
+                lastBreak.get(e.getPlayer().getUniqueId()) + 250 > System.currentTimeMillis()) {
+            return;
+        }
+        lastBreak.put(e.getPlayer().getUniqueId(), System.currentTimeMillis());
         if (plugin.getAfkAdapter().isAFK(e.getPlayer()) && plugin.getBlockConfig().getBoolean("options.blockafk", true)) {
             e.getPlayer().spigot().sendMessage(ChatMessageType.valueOf(plugin.getBlockConfig().getString("options.notification-type", "ACTION_BAR")), TextComponent.fromLegacyText(
                     Common.colorize(
