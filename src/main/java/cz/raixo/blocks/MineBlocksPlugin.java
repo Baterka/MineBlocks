@@ -292,10 +292,6 @@ public class MineBlocksPlugin extends JavaPlugin {
                 public void run() {
                     String s = MineBlocksPlugin.this.getDescription().getVersion().toLowerCase(Locale.ROOT);
                     boolean b = false;
-                    if (getHologramManager().getHologramPlugin() == HologramManager.HologramPluginType.CMI) {
-                        MainCommand.message(player, "You are using <#2bb9e0>CMI &ras your hologram plugin in <#2bb9e0>MineBlocks&r!");
-                        MainCommand.error(player, "You might be experiencing some issues! Please report them on our discord!");
-                    }
                     if (s.contains("dev")) {
                         MainCommand.message(player, "You are using <#2bb9e0>development &rversion of <#2bb9e0>MineBlocks&r!");
                         b = true;

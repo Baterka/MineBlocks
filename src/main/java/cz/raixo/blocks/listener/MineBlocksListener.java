@@ -60,7 +60,7 @@ public class MineBlocksListener implements Listener {
         if (plugin.getAfkAdapter().isAFK(e.getPlayer()) && plugin.getBlockConfig().getBoolean("options.blockafk", true)) {
             e.getPlayer().spigot().sendMessage(ChatMessageType.valueOf(plugin.getBlockConfig().getString("options.notification-type", "ACTION_BAR")), TextComponent.fromLegacyText(
                     Common.colorize(
-                            plugin.getBlockConfig().getString("lang.afk", "&cYou are AFK!")
+                            mineBlock.parseHoloLine(plugin.getBlockConfig().getString("lang.afk", "&cYou are AFK!"))
                     )
             ));
             e.getPlayer().playSound(e.getBlock().getLocation(), Sound.BLOCK_ANVIL_LAND, 100, 100);
@@ -70,7 +70,7 @@ public class MineBlocksListener implements Listener {
         if (permission != null && !permission.isEmpty() && !e.getPlayer().hasPermission(permission)) {
             e.getPlayer().spigot().sendMessage(ChatMessageType.valueOf(plugin.getBlockConfig().getString("options.notification-type", "ACTION_BAR")), TextComponent.fromLegacyText(
                     Common.colorize(
-                            plugin.getBlockConfig().getString("lang.no-permission", "&cYou don't have permission to break this block!")
+                            mineBlock.parseHoloLine(plugin.getBlockConfig().getString("lang.no-permission", "&cYou don't have permission to break this block!"))
                     )
             ));
             e.getPlayer().playSound(e.getBlock().getLocation(), Sound.BLOCK_ANVIL_LAND, 100, 100);
@@ -84,7 +84,7 @@ public class MineBlocksListener implements Listener {
         } else {
             e.getPlayer().spigot().sendMessage(ChatMessageType.valueOf(plugin.getBlockConfig().getString("options.notification-type", "ACTION_BAR")), TextComponent.fromLegacyText(
                     Common.colorize(
-                            MineBlocksPlugin.getInstance().getBlockConfig().getString("lang.timeout", "&cYou can't destroy the block now!")
+                            mineBlock.parseHoloLine(MineBlocksPlugin.getInstance().getBlockConfig().getString("lang.timeout", "&cYou can't destroy the block now!"))
                     )
             ));
             e.getPlayer().playSound(e.getBlock().getLocation(), Sound.BLOCK_ANVIL_LAND, 100, 100);

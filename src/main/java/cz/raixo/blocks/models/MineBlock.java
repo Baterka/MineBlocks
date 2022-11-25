@@ -13,6 +13,7 @@ import cz.raixo.blocks.util.Cooldown;
 import cz.raixo.blocks.util.Placeholder;
 import cz.raixo.blocks.util.SimpleRandom;
 import eu.d0by.utils.Common;
+import eu.decentsoftware.holograms.api.utils.PAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -100,7 +101,7 @@ public class MineBlock {
                         String playerMessage = message
                                 .replace("%breaks%", String.valueOf(rewardData.getOrDefault(onlinePlayer.getUniqueId(), new PlayerRewardData(onlinePlayer)).getBreaks()))
                                 .replace("%player%", onlinePlayer.getName());
-                        onlinePlayer.sendMessage(playerMessage);
+                        onlinePlayer.sendMessage(Common.colorize(PAPI.setPlaceholders(onlinePlayer, playerMessage)));
                     }
                 }
                 for (PlayerRewardData value : new LinkedList<>(rewardData.values())) {
@@ -166,7 +167,7 @@ public class MineBlock {
         hologram.show(Bukkit.getOnlinePlayers().toArray(Player[]::new));
     }
 
-    private String parseHoloLine(String line) {
+    public String parseHoloLine(String line) {
         return parseTopPlayers(
                 line
                         .replace("%health%", String.valueOf(this.health))
@@ -187,9 +188,11 @@ public class MineBlock {
             if (i < players.size()) {
                 data.put("player_" + (i + 1), players.get(i).getPlayerData().getDisplayName());
                 data.put("player_" + (i + 1) + "_breaks", String.valueOf(players.get(i).getBreaks()));
+                data.put("player_" + (i + 1) + "_prefix", "%parseother_{"+ players.get(i).getPlayerData().getName() +"}_{luckperms_prefix}%");
             } else {
                 data.put("player_" + (i + 1), Common.colorize(MineBlocksPlugin.getInstance().getBlockConfig().getString("lang.top.nobody", "&cNobody")));
                 data.put("player_" + (i + 1) + "_breaks", MineBlocksPlugin.getInstance().getBlockConfig().getString("lang.top.nobody-breaks", "0"));
+                data.put("player_" + (i + 1) + "_prefix", "");
             }
         }
         return Placeholder.translate(message, data);
