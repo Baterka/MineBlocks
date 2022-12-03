@@ -1,6 +1,6 @@
 name: MineBlocks
 description: Easy to use plugin, that allows you to create "Mine blocks" on your server
-version: 1.2.2
+version: 1.2.3
 main: cz.raixo.blocks.MineBlocksPlugin
 author: RAIXOCZ
 website: https://discord.gg/gTKvK48Par

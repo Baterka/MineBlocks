@@ -5,16 +5,15 @@ import cz.raixo.blocks.models.reward.PlayerRewardData;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class StorageData {
 
     private long health;
     private List<PlayerRewardData> rewardData = new ArrayList<>();
-
+    private List<PlayerRewardData> lastTop;
     private Date blockedUntil;
 
     public StorageData(JSONObject jsonObject) {
@@ -26,11 +25,20 @@ public class StorageData {
                 this.rewardData.add(new PlayerRewardData((JSONObject) o));
             }
         }
+        if (jsonObject.has("lastTop")) {
+            this.lastTop = new ArrayList<>();
+            for (Object o : jsonObject.getJSONArray("lastTop")) {
+                if (o instanceof JSONObject) {
+                    lastTop.add(new PlayerRewardData((JSONObject) o));
+                }
+            }
+        }
     }
     public StorageData(MineBlock mineBlock) {
         this.health = mineBlock.getHealth();
         this.rewardData = new ArrayList<>(mineBlock.getRewardData().values());
         this.blockedUntil = mineBlock.getBlockedUntil();
+        this.lastTop = mineBlock.getTopPlayers();
     }
 
     public JSONObject toJson() {
@@ -44,6 +52,13 @@ public class StorageData {
         if (blockedUntil != null && blockedUntil.getTime() > System.currentTimeMillis()) {
             data.put("blockedUntil", blockedUntil.getTime());
         }
+        if (lastTop != null) {
+            JSONArray lastTopArray = new JSONArray();
+            for (PlayerRewardData reward : this.lastTop) {
+                lastTopArray.put(reward.toJson());
+            }
+            data.put("lastTop", lastTopArray);
+        }
         return data;
     }
 
@@ -54,6 +69,7 @@ public class StorageData {
         mineBlock.updateTopPlayers(true);
         mineBlock.setHealth(this.health);
         mineBlock.setBlockedUntil(this.blockedUntil);
+        mineBlock.setLastTopPlayers(lastTop);
     }
 
 }

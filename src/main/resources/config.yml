@@ -17,6 +17,7 @@ options:
   blockafk: true
   hologram-auto-refresh: true # fixes bug with holograms
   notification-type: ACTION_BAR # ACTION_BAR, CHAT, SYSTEM
+  block-break-limit: 250 # Block break timeout in ms
 blocks:
   example:
     location: # Location of the block

@@ -64,7 +64,7 @@ public class MineBlocksListener implements Listener {
         if (mineBlock == null) return;
         e.setCancelled(true);
         if (lastBreak.containsKey(e.getPlayer().getUniqueId()) &&
-                lastBreak.get(e.getPlayer().getUniqueId()) + 250 > System.currentTimeMillis()) {
+                lastBreak.get(e.getPlayer().getUniqueId()) + plugin.getBlockConfig().getLong("options.block-break-limit", -1) > System.currentTimeMillis()) {
             return;
         }
         lastBreak.put(e.getPlayer().getUniqueId(), System.currentTimeMillis());

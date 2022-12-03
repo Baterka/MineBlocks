@@ -51,6 +51,7 @@ public class MineBlock {
     private List<Reward> lastBreakRewards = new LinkedList<>();
     private List<Reward> breakRewards = new LinkedList<>();
     private List<PlayerRewardData> topPlayers = new ArrayList<>();
+    private List<PlayerRewardData> lastTopPlayers = new ArrayList<>();
     private int blockMinutes = 0;
     private Date blockedUntil;
     private BukkitTask respawnTask;
@@ -83,6 +84,7 @@ public class MineBlock {
         if (getBlockSeconds() > 0) {
             setBlockedUntil(new Date(System.currentTimeMillis() + TimeUnit.MILLISECONDS.convert(this.blockMinutes, TimeUnit.SECONDS)));
         }
+        this.lastTopPlayers = new ArrayList<>(this.topPlayers);
         new BukkitRunnable() {
 
             private final List<PlayerRewardData> topPlayers = new ArrayList<>(MineBlock.this.topPlayers);
@@ -368,6 +370,9 @@ public class MineBlock {
     }
 
     public List<PlayerRewardData> getTopPlayers() {
+        if (isBlocked() && lastTopPlayers != null) {
+            return Collections.unmodifiableList(lastTopPlayers);
+        }
         return new ArrayList<>(topPlayers);
     }
 
@@ -413,6 +418,7 @@ public class MineBlock {
                         Bukkit.broadcastMessage(Common.colorize(MineBlock.this.respawnMessage.replace("<nl>", "\n")));
                     }
                     getLocation().getBlock().setType(blockType);
+                    lastTopPlayers = null;
                 }, time);
             }
         } else getLocation().getBlock().setType(getBlockType());
@@ -527,4 +533,11 @@ public class MineBlock {
         }
     }
 
+    public List<PlayerRewardData> getLastTopPlayers() {
+        return lastTopPlayers;
+    }
+
+    public void setLastTopPlayers(List<PlayerRewardData> lastTopPlayers) {
+        this.lastTopPlayers = lastTopPlayers;
+    }
 }
