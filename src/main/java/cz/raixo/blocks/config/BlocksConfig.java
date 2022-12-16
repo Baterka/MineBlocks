@@ -409,27 +409,29 @@ public class BlocksConfig implements ConfigurationSection {
 
     @Override
     public ConfigurationSection createSection(String s) {
-        return configuration.createSection(s);
+        return new SubConfig(configuration.createSection(s));
     }
 
     @Override
     public ConfigurationSection createSection(String s, Map<?, ?> map) {
-        return configuration.createSection(s, map);
+        return new SubConfig(configuration.createSection(s, map));
     }
 
     @Override
     public String getString(String s) {
+        if (configuration.isList(s)) return String.join("<nl>", configuration.getStringList(s));
         return configuration.getString(s);
     }
 
     @Override
     public String getString(String s, String s1) {
+        if (configuration.isList(s)) return String.join("<nl>", configuration.getStringList(s));
         return configuration.getString(s, s1);
     }
 
     @Override
     public boolean isString(String s) {
-        return configuration.isString(s);
+        return configuration.isString(s) || configuration.isList(s);
     }
 
     @Override
@@ -654,7 +656,7 @@ public class BlocksConfig implements ConfigurationSection {
 
     @Override
     public ConfigurationSection getConfigurationSection(String s) {
-        return configuration.getConfigurationSection(s);
+        return new SubConfig(configuration.getConfigurationSection(s));
     }
 
     @Override
