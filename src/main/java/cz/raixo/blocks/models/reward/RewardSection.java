@@ -51,14 +51,15 @@ public class RewardSection {
         this.rewards.clear();
     }
 
-    public void executeFor(String player, int breaks) {
+    public void executeFor(PlayerRewardData data) {
+        int breaks = data.getBreaks();
         if (breaks <= this.to && breaks > this.from) {
             if (!this.rewards.isEmpty()) {
                 SimpleRandom<Reward> rewards = new SimpleRandom<>();
                 for (Reward reward : this.rewards) {
                     rewards.add(reward.getChance(), reward);
                 }
-                rewards.next().executeFor(player);
+                rewards.next().executeFor(data);
             }
         }
 

@@ -25,7 +25,7 @@ public class PlayerRewardData {
 
     public void reward(MineBlock mineBlock) {
         for (RewardSection reward : mineBlock.getRewards()) {
-            reward.executeFor(playerData.getName(), breaks);
+            reward.executeFor(this);
         }
     }
 

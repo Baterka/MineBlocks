@@ -60,12 +60,12 @@ public class MineBlock {
     public void onBreak(Player player) {
         if (isUnloaded()) return;
         UUID uuid = player.getUniqueId();
-        rewardData.computeIfAbsent(uuid, k -> new PlayerRewardData(player));
-        rewardData.get(uuid).addBreak();
+        PlayerRewardData data = rewardData.computeIfAbsent(uuid, k -> new PlayerRewardData(player));
+        data.addBreak();
         health--;
-        giveBreakRewards(player.getName());
+        giveBreakRewards(data);
         if (health <= 0) {
-            giveLastBreakRewards(player.getName());
+            giveLastBreakRewards(data);
             onBreak();
         }
         new BukkitRunnable() {
@@ -118,7 +118,7 @@ public class MineBlock {
                         for (Reward reward : topRewardList) {
                             rewardRandom.add(reward.getChance(), reward);
                         }
-                        rewardRandom.next().executeFor(playerData.getPlayerData().getName());
+                        rewardRandom.next().executeFor(playerData);
                     }
                 }
             }
@@ -424,22 +424,22 @@ public class MineBlock {
         } else getLocation().getBlock().setType(getBlockType());
     }
 
-    protected void giveLastBreakRewards(String name) {
+    protected void giveLastBreakRewards(PlayerRewardData data) {
         if (lastBreakRewards.isEmpty()) return;
         SimpleRandom<Reward> rewardRandom = new SimpleRandom<>();
         for (Reward reward : lastBreakRewards) {
             rewardRandom.add(reward.getChance(), reward);
         }
-        rewardRandom.next().executeFor(name);
+        rewardRandom.next().executeFor(data);
     }
 
-    protected void giveBreakRewards(String name) {
+    protected void giveBreakRewards(PlayerRewardData data) {
         if (breakRewards.isEmpty()) return;
         SimpleRandom<Reward> rewardRandom = new SimpleRandom<>();
         for (Reward reward : breakRewards) {
             rewardRandom.add(reward.getChance(), reward);
         }
-        rewardRandom.next().executeFor(name);
+        rewardRandom.next().executeFor(data);
     }
 
     private static final long HOUR_MS = TimeUnit.MILLISECONDS.convert(1, TimeUnit.HOURS);

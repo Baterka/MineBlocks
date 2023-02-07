@@ -11,6 +11,8 @@ softdepend:
   - Essentials
   - UltraAFK
   - AFKPlus
+softdepend:
+  - PlaceholderAPI
 commands:
   mineblocks:
     aliases:

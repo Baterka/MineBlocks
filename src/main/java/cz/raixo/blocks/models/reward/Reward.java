@@ -1,5 +1,7 @@
 package cz.raixo.blocks.models.reward;
 
+import eu.decentsoftware.holograms.api.utils.PAPI;
+import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 
 public class Reward {
@@ -12,8 +14,13 @@ public class Reward {
         this.command = command;
     }
 
-    public void executeFor(String player) {
-        String cmd = command.replace("%player%", player);
+    public void executeFor(PlayerRewardData data) {
+        String cmd = command
+                .replace("%player%", data.getPlayerData().getName())
+                .replace("%breaks%", String.valueOf(data.getBreaks()));
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            cmd = PlaceholderAPI.setPlaceholders(Bukkit.getOfflinePlayer(data.getPlayerData().getUuid()), cmd);
+        }
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
     }
 
