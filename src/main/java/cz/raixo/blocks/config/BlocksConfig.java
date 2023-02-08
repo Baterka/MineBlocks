@@ -139,6 +139,8 @@ public class BlocksConfig implements ConfigurationSection {
             return null;
         }
         mineBlock.setMaxHealth(blockConfig.getInt("health"));
+        mineBlock.setResetInactive(blockConfig.getInt("resetInactiveTime", -1));
+        mineBlock.setResetInactiveMessage(blockConfig.getString("resetInactiveMessage"));
         List<RewardSection> rewards = getRewards(name);
         if (rewards != null) {
             mineBlock.setRewards(rewards);
@@ -328,6 +330,8 @@ public class BlocksConfig implements ConfigurationSection {
         blockConfig.set("hologram", mineBlock.getHologram());
         blockConfig.set("breakMessage", mineBlock.getBreakMessage());
         blockConfig.set("respawnMessage", mineBlock.getRespawnMessage());
+        blockConfig.set("resetInactiveTime", mineBlock.getResetInactive() > 0 ? mineBlock.getResetInactive() : null);
+        blockConfig.set("resetInactiveMessage", mineBlock.getResetInactiveMessage());
         if (mineBlock.getBlockSeconds() > 0) {
             blockConfig.set("timeout", mineBlock.getBlockSeconds());
         }

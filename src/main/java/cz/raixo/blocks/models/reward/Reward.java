@@ -1,6 +1,5 @@
 package cz.raixo.blocks.models.reward;
 
-import eu.decentsoftware.holograms.api.utils.PAPI;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 

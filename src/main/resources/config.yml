@@ -42,6 +42,8 @@ blocks:
     timeout: 60 # Timeout in seconds
     breakMessage: "&7Block was destroyed<nl>&7Your breaks: %breaks%"
     respawnMessage: "&7Block was respawned!"
+    resetInactiveTime: -1 # When nobody mines the block for this amount of seconds, it will automatically reset
+    resetInactiveMessage: "&7Block was healed, because nobody mined it for 5 minutes. You lost %breaks% breaks"
     lastBreakReward:
       - "100;say %player% broke the block the last time!"
     breakReward:
