@@ -3,7 +3,6 @@ package cz.raixo.blocks.afk;
 import com.Zrips.CMI.CMI;
 import com.Zrips.CMI.Containers.CMIUser;
 import com.earth2me.essentials.Essentials;
-import hotdoctor.plugin.ultraafk.UltraAFKAPI;
 import net.lapismc.afkplus.AFKPlus;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
